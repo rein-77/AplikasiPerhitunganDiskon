@@ -9,9 +9,17 @@
  */
 public class AplikasiPerhitunganDiskon extends javax.swing.JFrame {
 
+    // Deklarasi variabel untuk menyimpan harga dan diskon
+    private double harga = 0.0;
+    private double diskon = 10.0; // Inisialisasi nilai default sesuai pilihan pertama (10%)
+    private double hasil = 0.0;
+
     /** Creates new form AplikasiPerhitunganDiskon */
     public AplikasiPerhitunganDiskon() {
         initComponents();
+        // Inisialisasi nilai diskon saat aplikasi pertama kali dibuka
+        String selectedDiskon = (String) cbDiskon.getSelectedItem();
+        diskon = Double.parseDouble(selectedDiskon.replace("%", ""));
     }
 
     /** This method is called from within the constructor to
@@ -53,6 +61,16 @@ public class AplikasiPerhitunganDiskon extends javax.swing.JFrame {
         jPanel1.add(tfHarga, gridBagConstraints);
 
         cbDiskon.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10%", "20%", "50%", "90%" }));
+        cbDiskon.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbDiskonItemStateChanged(evt);
+            }
+        });
+        cbDiskon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbDiskonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -115,8 +133,72 @@ public class AplikasiPerhitunganDiskon extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnHitungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHitungActionPerformed
-        // TODO add your handling code here:
+        try {
+            // Mengambil input harga dari text field
+            String hargaInput = tfHarga.getText().trim(); // Tambahkan trim() untuk membersihkan spasi
+            
+            // Validasi input tidak boleh kosong
+            if (hargaInput.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Harga tidak boleh kosong!",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            harga = Double.parseDouble(hargaInput);
+            
+            // Validasi harga tidak boleh negatif
+            if (harga < 0) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Harga tidak boleh negatif!",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                tfHarga.setText("");
+                return;
+            }
+            
+            // Menghitung diskon berdasarkan persentase yang dipilih
+            double diskonPersen = diskon;
+            double jumlahDiskon = harga * (diskonPersen / 100);
+            hasil = harga - jumlahDiskon;
+            
+            // Membuat format currency dengan pemisah ribuan
+            java.text.NumberFormat currencyFormat = java.text.NumberFormat.getInstance(new java.util.Locale("id", "ID"));
+            currencyFormat.setMinimumFractionDigits(2);
+            currencyFormat.setMaximumFractionDigits(2);
+            
+            // Menampilkan hasil perhitungan dengan format currency
+            String formattedHasil = "Rp " + currencyFormat.format(hasil);
+            tfHasil.setText(formattedHasil);
+            
+            // Menampilkan informasi penghematan dengan format currency
+            String pesanPenghematan = "Anda hemat: Rp " + currencyFormat.format(jumlahDiskon);
+            javax.swing.JOptionPane.showMessageDialog(this, pesanPenghematan, "Info Penghematan", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+        } catch (NumberFormatException e) {
+            // Menangani kesalahan input
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Masukkan harga yang valid!", 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            tfHarga.setText("");
+            tfHasil.setText("");
+        }
     }//GEN-LAST:event_btnHitungActionPerformed
+
+    private void cbDiskonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbDiskonItemStateChanged
+        // Mengupdate nilai diskon ketika pilihan berubah
+        if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+            String selectedDiskon = (String) cbDiskon.getSelectedItem();
+            // Mengambil nilai numerik dari string diskon (menghapus karakter %)
+            diskon = Double.parseDouble(selectedDiskon.replace("%", ""));
+        }
+    }//GEN-LAST:event_cbDiskonItemStateChanged
+
+    private void cbDiskonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbDiskonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbDiskonActionPerformed
 
     /**
      * @param args the command line arguments
